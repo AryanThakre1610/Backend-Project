@@ -1,13 +1,11 @@
 using ShooterBackend.Managers;
 using ShooterBackend.Models;
-using System;
-using System.Linq;
 
-namespace Services
+namespace ShooterBackend.Services
 {
     public static class SearchService
     {
-        public static void SearchItemsByName(Inventory<GameItem> inventory, string name)
+        public static void SearchItemsByName(Inventory<Item> inventory, string name)
         {
             var results = inventory.GetAll()
                                    .Where(i => i.Name.Contains(name, StringComparison.OrdinalIgnoreCase));
@@ -22,6 +20,23 @@ namespace Services
 
             foreach (var item in results)
                 item.DisplayInfo();
+        }
+
+        public static void SearchCharacterByName(Inventory<Character> inventory, string name)
+        {
+            var results = inventory.GetAll()
+                                   .Where(i => i.Name.Contains(name, StringComparison.OrdinalIgnoreCase));
+
+            Console.WriteLine($"\nSearch results for '{name}':");
+
+            if (!results.Any())
+            {
+                Console.WriteLine("No items found.");
+                return;
+            }
+
+            foreach (var character in results)
+                character.DisplayInfo();
         }
 
         public static void FilterWeaponsByRarity(Inventory<Weapon> inventory, string rarity)

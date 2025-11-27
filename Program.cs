@@ -1,243 +1,323 @@
 using ShooterBackend.Models;
 using ShooterBackend.Managers;
-using Utils;
-using Services;
-using System;
+using ShooterBackend.Utils;
+using ShooterBackend.Services;
 
 class Program
 {
+    static Inventory<Item> itemInventory = new();
+    static Inventory<Character> characterInventory = new();
+    static Inventory<Weapon> weaponInventory = new();
+    static Inventory<PowerUp> powerUpInventory = new();
+
     static void Main()
     {
-        var itemInventory = new Inventory<GameItem>();
-        var charInventory = new Inventory<Character>();
-        var weaponInventory = new Inventory<Weapon>();
-        var powerUpInventory = new Inventory<PowerUp>();
-        bool exit = false;
+        MainMenu();
+    }
 
-        while (!exit)
+    // ===================== MAIN MENU =====================
+    static void MainMenu()
+    {
+        while (true)
         {
             Console.Clear();
             Console.WriteLine("=== Video Game Data Management System ===\n");
-            Console.WriteLine("1. View Items");
-            Console.WriteLine("2. Add Item");
-            Console.WriteLine("3. Update Item");
-            Console.WriteLine("4. Delete Item");
-            Console.WriteLine("5. Generate Random Items");
-            Console.WriteLine("6. View Characters");
-            Console.WriteLine("7. Add Character");
-            Console.WriteLine("8. Update Character");
-            Console.WriteLine("9. Delete Character");
-            Console.WriteLine("10. Generate Random Characters");
-            Console.WriteLine("11. Show Item Statistics");
-            Console.WriteLine("12. Show Character Statistics");
-            Console.WriteLine("13. View Weapons");
-            Console.WriteLine("14. Add Weapon");
-            Console.WriteLine("15. Delete Weapon");
-            Console.WriteLine("16. Generate Random Weapons");
-            Console.WriteLine("17. Show Weapon Statistics");
-            Console.WriteLine("18. View PowerUps");
-            Console.WriteLine("19. Add PowerUp");
-            Console.WriteLine("20. Generate Random PowerUps");
-            Console.WriteLine("21. Show PowerUp Statistics");
-            Console.WriteLine("22. Search Items by Name");
-            Console.WriteLine("22. Filter Weapons by Rarity");
-            Console.WriteLine("23. Show PowerUp Statistics");
-            Console.WriteLine("24. Show Top Characters by Level");
-
+            Console.WriteLine("1. Manage Items");
+            Console.WriteLine("2. Manage Characters");
+            Console.WriteLine("3. Manage Weapons");
+            Console.WriteLine("4. Manage PowerUps");
+            Console.WriteLine("5. Data Analytics");
             Console.WriteLine("0. Exit");
-            Console.Write("\nSelect an option: ");
+            Console.Write("\nChoose an option: ");
 
             switch (Console.ReadLine())
             {
-                // GameItem
-                case "1": itemInventory.ViewAll(); break;
-                case "2": AddItem(itemInventory); break;
-                case "3": UpdateItem(itemInventory); break;
-                case "4": DeleteItem(itemInventory); break;
-                case "5":
-                    Console.Write("Number of random items to generate: ");
-                    int itemCount = int.Parse(Console.ReadLine());
-                    RandomDataGenerator.GenerateItems(itemInventory, itemCount);
-                    break;
+                case "1": EntityMenu("Items"); break;
+                case "2": EntityMenu("Characters"); break;
+                case "3": EntityMenu("Weapons"); break;
+                case "4": EntityMenu("PowerUps"); break;
+                case "5": AnalyticsMenu(); break;
+                case "0": return;
+                default: ShowError(); break;
+            }
+        }
+    }
 
-                // Character
-                case "6": charInventory.ViewAll(); break;
-                case "7": AddCharacter(charInventory); break;
-                case "8": UpdateCharacter(charInventory); break;
-                case "9": DeleteCharacter(charInventory); break;
-                case "10":
-                    Console.Write("Number of random characters to generate: ");
-                    int charCount = int.Parse(Console.ReadLine());
-                    RandomDataGenerator.GenerateCharacters(charInventory, charCount);
-                    break;
+    // ===================== ENTITY SUB MENU =====================
+    static void EntityMenu(string type)
+    {
+        while (true)
+        {
+            Console.Clear();
+            Console.WriteLine($"=== Manage {type} ===\n");
+            Console.WriteLine("1. View All");
+            Console.WriteLine("2. Add");
+            Console.WriteLine("3. Update");
+            Console.WriteLine("4. Delete");
+            Console.WriteLine("5. Generate Random");
+            Console.WriteLine("6. Search");
+            Console.WriteLine("0. Back");
 
-                // Stats for GameItem and Character
-                case "11": AnalysisService.ShowItemStatistics(itemInventory); break;
-                case "12": AnalysisService.ShowCharacterStatistics(charInventory); break;
+            Console.Write("\nChoose: ");
+            string choice = Console.ReadLine();
 
-                // Weapons
-                case "13": weaponInventory.ViewAll(); break;
-                case "14": AddWeapon(weaponInventory); break;
-                case "15": DeleteWeapon(weaponInventory); break;
-                case "16":
-                    Console.Write("Number of random weapons to generate: ");
-                    int weaponCount = int.Parse(Console.ReadLine());
-                    RandomDataGenerator.GenerateWeapons(weaponInventory, weaponCount);
-                    break;
-                case "17": AnalysisService.ShowWeaponStatistics(weaponInventory); break;
-
-                // PowerUps
-                case "18": powerUpInventory.ViewAll(); break;
-                case "19": AddPowerUp(powerUpInventory); break;
-                case "20":
-                    Console.Write("Number of random power-ups to generate: ");
-                    int powerUpCount = int.Parse(Console.ReadLine());
-                    RandomDataGenerator.GeneratePowerUps(powerUpInventory, powerUpCount);
-                    break;
-                case "21": AnalysisService.ShowPowerUpStatistics(powerUpInventory); break;
-                case "22":
-                    Console.Write("Enter name to search: ");
-                    SearchService.SearchItemsByName(itemInventory, Console.ReadLine());
-                    break;
-
-                case "23":
-                    Console.Write("Enter rarity (Common, Rare, Epic, Legendary): ");
-                    SearchService.FilterWeaponsByRarity(weaponInventory, Console.ReadLine());
-                    break;
-
-                case "24":
-                    Console.Write("How many characters to show? ");
-                    int count = int.Parse(Console.ReadLine());
-                    SearchService.TopCharactersByLevel(charInventory, count);
-                    break;
-
-                // Exit
-                case "0": exit = true; break;
-
-                default:
-                    Console.WriteLine("Invalid option.");
-                    break;
+            switch (type)
+            {
+                case "Items": HandleItemMenu(choice); break;
+                case "Characters": HandleCharacterMenu(choice); break;
+                case "Weapons": HandleWeaponMenu(choice); break;
+                case "PowerUps": HandlePowerUpMenu(choice); break;
             }
 
-            Console.WriteLine("\nPress any key to continue...");
-            Console.ReadKey();
+            if (choice == "0")
+                return;
         }
-
-        Console.WriteLine("Exiting program. Goodbye!");
     }
 
-    // --- GameItem CRUD ---
-    static void AddItem(Inventory<GameItem> inventory)
+    // ===================== ITEM HANDLER =====================
+    static void HandleItemMenu(string choice)
     {
-        Console.Write("Name: ");
-        string name = Console.ReadLine();
-        Console.Write("Category: ");
-        string category = Console.ReadLine();
-        Console.Write("Power: ");
-        int power = int.Parse(Console.ReadLine());
-        Console.Write("Value: ");
-        double value = double.Parse(Console.ReadLine());
-
-        inventory.Add(new GameItem(name, category, power, value));
+        switch (choice)
+        {
+            case "1": itemInventory.ViewAll(); break;
+            case "2": AddItem(); break;
+            case "3": UpdateItem(); break;
+            case "4": DeleteItem(); break;
+            case "5":
+                Console.Write("Count: ");
+                RandomDataGenerator.GenerateItems(itemInventory, int.Parse(Console.ReadLine()));
+                break;
+            case "6": Search("Item"); break;
+            case "0": return;
+            default: ShowError(); break;
+        }
+        Pause();
     }
 
-    static void UpdateItem(Inventory<GameItem> inventory)
+    // ===================== CHARACTER HANDLER =====================
+    static void HandleCharacterMenu(string choice)
     {
-        Console.Write("Enter ID to update: ");
-        int id = int.Parse(Console.ReadLine());
-
-        Console.Write("New Name: ");
-        string name = Console.ReadLine();
-        Console.Write("New Category: ");
-        string category = Console.ReadLine();
-        Console.Write("New Power: ");
-        int power = int.Parse(Console.ReadLine());
-        Console.Write("New Value: ");
-        double value = double.Parse(Console.ReadLine());
-
-        inventory.Update(id, new GameItem(name, category, power, value));
+        switch (choice)
+        {
+            case "1": characterInventory.ViewAll(); break;
+            case "2": AddCharacter(); break;
+            case "3": UpdateCharacter(); break;
+            case "4": DeleteCharacter(); break;
+            case "5":
+                Console.Write("Count: ");
+                RandomDataGenerator.GenerateCharacters(characterInventory, int.Parse(Console.ReadLine()));
+                break;
+            case "6": Search("Character"); break;
+            case "0": return;
+            default: ShowError(); break;
+        }
+        Pause();
     }
 
-    static void DeleteItem(Inventory<GameItem> inventory)
+    // ===================== WEAPON HANDLER =====================
+    static void HandleWeaponMenu(string choice)
     {
-        Console.Write("Enter ID to delete: ");
-        int id = int.Parse(Console.ReadLine());
-        inventory.Delete(id);
+        switch (choice)
+        {
+            case "1": weaponInventory.ViewAll(); break;
+            case "2": AddWeapon(); break;
+            case "3": UpdateWeapon(); break;
+            case "4": DeleteWeapon(); break;
+            case "5":
+                Console.Write("Count: ");
+                RandomDataGenerator.GenerateWeapons(weaponInventory, int.Parse(Console.ReadLine()));
+                break;
+            case "6": Search("Item"); break; 
+            case "0": return;
+            default: ShowError(); break;
+        }
+        Pause();
     }
 
-    // --- Character CRUD ---
-    static void AddCharacter(Inventory<Character> inventory)
+    // ===================== POWERUP HANDLER =====================
+    static void HandlePowerUpMenu(string choice)
     {
-        Console.Write("Name: ");
-        string name = Console.ReadLine();
-        Console.Write("Level: ");
-        int level = int.Parse(Console.ReadLine());
-        Console.Write("Health: ");
-        int health = int.Parse(Console.ReadLine());
-
-        inventory.Add(new Character(name, level, health));
+        switch (choice)
+        {
+            case "1": powerUpInventory.ViewAll(); break;
+            case "2": AddPowerUp(); break;
+            case "3": UpdatePowerUp(); break;
+            case "4": DeletePowerUp(); break;
+            case "5":
+                Console.Write("Count: ");
+                RandomDataGenerator.GeneratePowerUps(powerUpInventory, int.Parse(Console.ReadLine()));
+                break;
+            case "6": Search("Item"); break;  // <-- SEARCH
+            case "0": return;
+            default: ShowError(); break;
+        }
+        Pause();
     }
 
-    static void UpdateCharacter(Inventory<Character> inventory)
+    // ===================== ANALYTICS MENU =====================
+    static void AnalyticsMenu()
     {
-        Console.Write("Enter ID to update: ");
-        int id = int.Parse(Console.ReadLine());
+        while (true)
+        {
+            Console.Clear();
+            Console.WriteLine("=== Data Analytics ===");
+            Console.WriteLine("1. Item Statistics");
+            Console.WriteLine("2. Character Statistics");
+            Console.WriteLine("3. Weapon Statistics");
+            Console.WriteLine("4. PowerUp Statistics");
+            Console.WriteLine("0. Back");
 
-        Console.Write("New Name: ");
-        string name = Console.ReadLine();
-        Console.Write("New Level: ");
-        int level = int.Parse(Console.ReadLine());
-        Console.Write("New Health: ");
-        int health = int.Parse(Console.ReadLine());
+            Console.Write("\nChoose: ");
 
-        inventory.Update(id, new Character(name, level, health));
+            switch (Console.ReadLine())
+            {
+                case "1": AnalysisService.ShowItemStatistics(itemInventory); break;
+                case "2": AnalysisService.ShowCharacterStatistics(characterInventory); break;
+                case "3": AnalysisService.ShowWeaponStatistics(weaponInventory); break;
+                case "4": AnalysisService.ShowPowerUpStatistics(powerUpInventory); break;
+                case "0": return;
+                default: ShowError(); break;
+            }
+            Pause();
+        }
     }
 
-    static void DeleteCharacter(Inventory<Character> inventory)
+    // ===================== CRUD METHODS =====================
+    static void AddItem()
     {
-        Console.Write("Enter ID to delete: ");
-        int id = int.Parse(Console.ReadLine());
-        inventory.Delete(id);
+        Console.Write("Name: "); string name = Console.ReadLine();
+        Console.Write("Category: "); string category = Console.ReadLine();
+        Console.Write("Power: "); int power = int.Parse(Console.ReadLine());
+        Console.Write("Value: "); double value = double.Parse(Console.ReadLine());
+
+        itemInventory.Add(new Item(name, category, power, value));
     }
 
-    // --- Weapon CRUD ---
-    static void AddWeapon(Inventory<Weapon> inventory)
+    static void UpdateItem()
     {
-        Console.Write("Name: ");
-        string name = Console.ReadLine();
-        Console.Write("Power: ");
-        int power = int.Parse(Console.ReadLine());
-        Console.Write("Value: ");
-        double value = double.Parse(Console.ReadLine());
-        Console.Write("Damage: ");
-        int damage = int.Parse(Console.ReadLine());
-        Console.Write("Rarity: ");
-        string rarity = Console.ReadLine();
+        Console.Write("ID: "); int id = int.Parse(Console.ReadLine());
+        Console.Write("Name: "); string name = Console.ReadLine();
+        Console.Write("Category: "); string category = Console.ReadLine();
+        Console.Write("Power: "); int power = int.Parse(Console.ReadLine());
+        Console.Write("Value: "); double value = double.Parse(Console.ReadLine());
 
-        inventory.Add(new Weapon(name, power, value, damage, rarity));
+        itemInventory.Update(id, new Item(name, category, power, value));
     }
 
-    static void DeleteWeapon(Inventory<Weapon> inventory)
+    static void DeleteItem()
     {
-        Console.Write("Enter ID to delete: ");
-        int id = int.Parse(Console.ReadLine());
-        inventory.Delete(id);
+        Console.Write("ID: ");
+        itemInventory.Delete(int.Parse(Console.ReadLine()));
     }
 
-    // --- PowerUp CRUD ---
-    static void AddPowerUp(Inventory<PowerUp> inventory)
+    // Characters...
+    static void AddCharacter()
     {
-        Console.Write("Name: ");
-        string name = Console.ReadLine();
-        Console.Write("Power: ");
-        int power = int.Parse(Console.ReadLine());
-        Console.Write("Value: ");
-        double value = double.Parse(Console.ReadLine());
-        Console.Write("Effect: ");
-        string effect = Console.ReadLine();
-        Console.Write("Duration (seconds): ");
-        int duration = int.Parse(Console.ReadLine());
+        Console.Write("Name: "); string name = Console.ReadLine();
+        Console.Write("Level: "); int level = int.Parse(Console.ReadLine());
+        Console.Write("Health: "); int health = int.Parse(Console.ReadLine());
 
-        inventory.Add(new PowerUp(name, power, value, effect, duration));
+        characterInventory.Add(new Character(name, level, health));
+    }
+
+    static void UpdateCharacter()
+    {
+        Console.Write("ID: "); int id = int.Parse(Console.ReadLine());
+        Console.Write("Name: "); string name = Console.ReadLine();
+        Console.Write("Level: "); int level = int.Parse(Console.ReadLine());
+        Console.Write("Health: "); int health = int.Parse(Console.ReadLine());
+
+        characterInventory.Update(id, new Character(name, level, health));
+    }
+
+    static void DeleteCharacter()
+    {
+        Console.Write("ID: ");
+        characterInventory.Delete(int.Parse(Console.ReadLine()));
+    }
+
+    // Weapons...
+    static void AddWeapon()
+    {
+        Console.Write("Name: "); string name = Console.ReadLine();        
+        Console.Write("Rarity: "); string rarity = Console.ReadLine();
+        Console.Write("Damage: "); int dmg = int.Parse(Console.ReadLine());
+        Console.Write("Value: "); double value = double.Parse(Console.ReadLine());
+        Console.Write("Power: "); int power = int.Parse(Console.ReadLine());
+
+        weaponInventory.Add(new Weapon(name, power, value, dmg, rarity));
+    }
+
+    static void UpdateWeapon()
+    {
+        Console.Write("ID: "); int id = int.Parse(Console.ReadLine());
+        Console.Write("Name: "); string name = Console.ReadLine();
+        Console.Write("Rarity: "); string rarity = Console.ReadLine();
+        Console.Write("Damage: "); int dmg = int.Parse(Console.ReadLine());
+        Console.Write("Value: "); double value = double.Parse(Console.ReadLine());
+        Console.Write("Power: "); int power = int.Parse(Console.ReadLine());
+
+        weaponInventory.Update(id, new Weapon(name, power, value, dmg, rarity));
+    }
+
+    static void DeleteWeapon()
+    {
+        Console.Write("ID: ");
+        weaponInventory.Delete(int.Parse(Console.ReadLine()));
+    }
+
+    // PowerUps...
+    static void AddPowerUp()
+    {
+        Console.Write("Name: "); string name = Console.ReadLine();
+        Console.Write("Effect: "); string effect = Console.ReadLine();
+        Console.Write("Duration: "); int duration = int.Parse(Console.ReadLine());
+        Console.Write("Value: "); double value = double.Parse(Console.ReadLine());
+        Console.Write("Power: "); int power = int.Parse(Console.ReadLine());
+    
+        powerUpInventory.Add(new PowerUp(name, power, value, effect, duration));
+    }
+
+    static void UpdatePowerUp()
+    {
+        Console.Write("ID: "); int id = int.Parse(Console.ReadLine());
+        Console.Write("Name: "); string name = Console.ReadLine();
+        Console.Write("Effect: "); string effect = Console.ReadLine();
+        Console.Write("Duration: "); int duration = int.Parse(Console.ReadLine());
+        Console.Write("Value: "); double value = double.Parse(Console.ReadLine());
+        Console.Write("Power: "); int power = int.Parse(Console.ReadLine());
+
+        powerUpInventory.Update(id, new PowerUp(name, power, value, effect, duration));
+    }
+
+    static void DeletePowerUp()
+    {
+        Console.Write("ID: ");
+        powerUpInventory.Delete(int.Parse(Console.ReadLine()));
+    }
+
+    static void Search(string entity)
+    {
+        Console.Write("Enter keyword to search in name/category: ");
+        string keyword = Console.ReadLine();
+        switch (entity)
+        {
+            case "Item": SearchService.SearchItemsByName(itemInventory, keyword); break;
+            case "Character": SearchService.SearchCharacterByName(characterInventory, keyword); break;
+            default: ShowError(); break;
+        }
+    }
+
+    // ===================== HELPERS =====================
+    static void Pause()
+    {
+        Console.WriteLine("\nPress any key to continue...");
+        Console.ReadKey();
+    }
+
+    static void ShowError()
+    {
+        Console.WriteLine("Invalid option!");
+        Pause();
     }
 }

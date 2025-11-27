@@ -1,6 +1,6 @@
 namespace ShooterBackend.Models
 {
-    public class Weapon : GameItem
+    public class Weapon : Item
     {
         public int Damage { get; set; }
         public string Rarity { get; set; }
