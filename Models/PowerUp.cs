@@ -1,6 +1,6 @@
 namespace ShooterBackend.Models
 {
-    public class PowerUp : GameItem
+    public class PowerUp : Item
     {
         public string Effect { get; set; }
         public int Duration { get; set; } // in seconds

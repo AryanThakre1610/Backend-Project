@@ -1,12 +1,12 @@
 namespace ShooterBackend.Models
 {
-    public class GameItem : GameEntity
+    public class Item : GameEntity
     {
         public string Category { get; set; }
         public int Power { get; set; }
         public double Value { get; set; }
 
-        public GameItem(string name, string category, int power, double value)
+        public Item(string name, string category, int power, double value)
             : base(name)
         {
             Category = category;

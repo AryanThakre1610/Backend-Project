@@ -1,14 +1,12 @@
 using ShooterBackend.Managers;
 using ShooterBackend.Models;
-using System;
-using System.Linq;
 
-namespace Services
+namespace ShooterBackend.Services
 {
     public static class AnalysisService
     {
-        // Existing: GameItem statistics
-        public static void ShowItemStatistics(Inventory<GameItem> inventory)
+        // Existing: Item statistics
+        public static void ShowItemStatistics(Inventory<Item> inventory)
         {
             var items = inventory.GetAll();
             if (!items.Any())
