@@ -1,7 +1,4 @@
 using ShooterBackend.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace ShooterBackend.Managers
 {

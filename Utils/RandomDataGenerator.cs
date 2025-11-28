@@ -1,8 +1,7 @@
 using ShooterBackend.Models;
 using ShooterBackend.Managers;
-using System;
 
-namespace Utils
+namespace ShooterBackend.Utils
 {
     public static class RandomDataGenerator
     {
@@ -15,12 +14,12 @@ namespace Utils
         private static string[] weaponRarities = { "Common", "Rare", "Epic", "Legendary" };
         private static string[] powerUpEffects = { "Heal", "Shield", "Speed Boost", "Strength Boost" };
 
-        // Generate generic GameItems
-        public static void GenerateItems(Inventory<GameItem> inventory, int count)
+        // Generate generic Items
+        public static void GenerateItems(Inventory<Item> inventory, int count)
         {
             for (int i = 0; i < count; i++)
             {
-                var item = new GameItem(
+                var item = new Item(
                     name: itemNames[random.Next(itemNames.Length)] + " " + random.Next(1, 101),
                     category: itemCategories[random.Next(itemCategories.Length)],
                     power: random.Next(1, 101),
