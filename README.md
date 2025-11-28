@@ -1,6 +1,6 @@
 # ShooterBackend
 
-A C# Console Application for Video Game Data Management
+C# Console Application for Video Game Data Management
 
 ## Overview
 ShooterBackend is a modular backend system for managing and analyzing data for a video game catalog. It supports inventory, character, weapon, and power-up management, and provides analytics via a menu-driven console interface. The project demonstrates OOP principles (interfaces, inheritance, composition) and LINQ-based data analysis.
